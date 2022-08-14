@@ -8,13 +8,13 @@ function Toggle({children}) {
     const [on, setOn] = React.useState(false)
     const toggle = () => setOn(!on)
 
+    const allowedTypes = [ToggleOn, ToggleOff, ToggleButton] // allowedTypes for passing down the props
+
     return React.Children.map(children, (child, index) => {
         //console.log(child)
-        if (typeof child.type !== 'function') return child // exclude plain old DOM components
+        if (!allowedTypes.includes(child.type)) return child
 
-        return child.type.name === 'ToggleButton'
-            ? React.cloneElement(child, {on, toggle})
-            : React.cloneElement(child, {on}) // using React.cloneElement to pass down the props that we want to the child components
+        return React.cloneElement(child, {on, toggle}) // using React.cloneElement to pass down the props that we want to the child components
             // , without needing to pass the props from the parent component
     })
 }
