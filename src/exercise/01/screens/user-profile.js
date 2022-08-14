@@ -4,11 +4,10 @@
 import * as React from 'react'
 import {dequal} from 'dequal'
 import {UserProvider, useUser} from "../context/user-context";
-import * as userClient from "../../../user-client";
 
 
 function UserSettings() {
-    const [{user, status, error}, userDispatch] = useUser()
+    const [{user, status, error}, userDispatch, updateUser] = useUser()
 
     const isPending = status === 'pending'
     const isRejected = status === 'rejected'
@@ -23,12 +22,7 @@ function UserSettings() {
 
     function handleSubmit(event) {
         event.preventDefault()
-        // 🐨 move the following logic to the `updateUser` function you create above
-        userDispatch({type: 'start update', updates: formState})
-        userClient.updateUser(user, formState).then(
-            updatedUser => userDispatch({type: 'finish update', updatedUser}),
-            error => userDispatch({type: 'fail update', error}),
-        )
+        updateUser(formState);
     }
 
     return (

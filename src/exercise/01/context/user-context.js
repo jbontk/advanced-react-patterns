@@ -1,5 +1,6 @@
 import React from "react";
 import {useAuth} from "../../../auth-context";
+import * as userClient from "../../../user-client";
 
 const UserContext = React.createContext()
 UserContext.displayName = 'UserContext'
@@ -54,7 +55,16 @@ function UserProvider({children}) {
         storedUser: user,
         user,
     })
-    const value = [state, dispatch]
+
+    let updateUser = (formState) => {
+        dispatch({type: 'start update', updates: formState})
+        userClient.updateUser(user, formState).then(
+            updatedUser => dispatch({type: 'finish update', updatedUser}),
+            error => dispatch({type: 'fail update', error}),
+        )
+    };
+
+    const value = [state, dispatch, updateUser]
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 }
 
