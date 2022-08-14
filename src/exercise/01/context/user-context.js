@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React from "react";
 import {useAuth} from "../../../auth-context";
 import * as userClient from "../../../user-client";
 
@@ -48,6 +48,8 @@ function userReducer(state, action) {
 }
 
 function UserProvider({children}) {
+    console.log('rendering UserProvider')
+
     const {user} = useAuth()
     const [state, dispatch] = React.useReducer(userReducer, {
         status: null,
@@ -56,18 +58,11 @@ function UserProvider({children}) {
         user,
     })
 
-    let updateUser = (formState) => {
-        dispatch({type: 'start update', updates: formState})
-        userClient.updateUser(user, formState).then(
-            updatedUser => dispatch({type: 'finish update', updatedUser}),
-            error => dispatch({type: 'fail update', error}),
-        )
-    };
-    updateUser = useCallback(updateUser, [user]);
-
-    const value = [state, dispatch, updateUser]
+    const value = [state, dispatch]
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 }
+
+
 
 function useUser() {
     const context = React.useContext(UserContext)
@@ -77,8 +72,12 @@ function useUser() {
     return context
 }
 
-// 🐨 add a function here called `updateUser`
-// Then go down to the `handleSubmit` from `UserSettings` and put that logic in
-// this function. It should accept: dispatch, user, and updates
+const updateUser = (user, dispatch, formState) => {
+    dispatch({type: 'start update', updates: formState})
+    userClient.updateUser(user, formState).then(
+        updatedUser => dispatch({type: 'finish update', updatedUser}),
+        error => dispatch({type: 'fail update', error}),
+    )
+}
 
-export {UserProvider, useUser}
+export {UserProvider, useUser, updateUser}

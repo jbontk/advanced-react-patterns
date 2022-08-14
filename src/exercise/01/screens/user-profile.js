@@ -3,11 +3,11 @@
 
 import * as React from 'react'
 import {dequal} from 'dequal'
-import {UserProvider, useUser} from "../context/user-context";
+import {updateUser, UserProvider, useUser} from "../context/user-context";
 
 
 function UserSettings() {
-    const [{user, status, error}, userDispatch, updateUser] = useUser()
+    const [{user, status, error}, userDispatch] = useUser()
 
     const isPending = status === 'pending'
     const isRejected = status === 'rejected'
@@ -22,7 +22,7 @@ function UserSettings() {
 
     function handleSubmit(event) {
         event.preventDefault()
-        updateUser(formState);
+        updateUser(user, userDispatch, formState);
     }
 
     return (
