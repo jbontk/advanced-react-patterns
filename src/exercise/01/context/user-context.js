@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useCallback} from "react";
 import {useAuth} from "../../../auth-context";
 import * as userClient from "../../../user-client";
 
@@ -63,6 +63,7 @@ function UserProvider({children}) {
             error => dispatch({type: 'fail update', error}),
         )
     };
+    updateUser = useCallback(updateUser, [user]);
 
     const value = [state, dispatch, updateUser]
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
