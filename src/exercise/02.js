@@ -10,6 +10,8 @@ function Toggle({children}) {
 
     return React.Children.map(children, (child, index) => {
         //console.log(child)
+        if (typeof child.type !== 'function') return child // exclude plain old DOM components
+
         return child.type.name === 'ToggleButton'
             ? React.cloneElement(child, {on, toggle})
             : React.cloneElement(child, {on}) // using React.cloneElement to pass down the props that we want to the child components
@@ -27,6 +29,7 @@ function App() {
             <Toggle>
                 <ToggleOn>The button is on</ToggleOn>
                 <ToggleOff>The button is off</ToggleOff>
+                <span>Hello</span>
                 <ToggleButton/>
             </Toggle>
         </div>
