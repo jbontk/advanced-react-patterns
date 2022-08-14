@@ -24,6 +24,7 @@ const ToggleOff = ({on, children}) => on ? null : children
 const ToggleButton = ({on, toggle}) => <Switch on={on} onClick={toggle}/>
 
 function App() {
+    // props of <ToggleOn>, <ToggleOff>, and <ToggleButton> are provided implicitly
     return (
         <div>
             <Toggle>
