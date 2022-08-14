@@ -19,8 +19,8 @@ function Toggle({children}) {
     })
 }
 
-const ToggleOn = ({on, children}) => on ? <>{children}</> : null;
-const ToggleOff = ({on, children}) => on ? null : <>{children}</>
+const ToggleOn = ({on, children}) => on ? children : null;
+const ToggleOff = ({on, children}) => on ? null : children
 const ToggleButton = ({on, toggle}) => <Switch on={on} onClick={toggle}/>
 
 function App() {
