@@ -22,7 +22,7 @@ function UserSettings() {
 
     function handleSubmit(event) {
         event.preventDefault()
-        updateUser(user, userDispatch, formState);
+        return updateUser(user, userDispatch, formState);
     }
 
     return (
