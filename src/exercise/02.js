@@ -10,7 +10,7 @@ function Toggle({children}) {
 
     const allowedTypes = [ToggleOn, ToggleOff, ToggleButton] // allowedTypes for passing down the props
 
-    return React.Children.map(children, (child, index) => {
+    return React.Children.map(children, (child) => {
         //console.log(child)
         if (!allowedTypes.includes(child.type)) return child
 
