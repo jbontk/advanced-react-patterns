@@ -4,6 +4,8 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 
+const callAll = (...fns) => (...args) => fns.forEach(fn => fn?.(args));
+
 function useToggle() {
     const [on, setOn] = React.useState(false)
     const toggle = () => setOn(!on)
@@ -12,13 +14,10 @@ function useToggle() {
     // `aria-pressed` and `onClick` properties.
     // 💰 {'aria-pressed': on, onClick: toggle}
     return {
-        on, toggle, getTogglerProps: ({onClick, ...customPropsRest}) => {
+        on, toggle, getTogglerProps: ({onClick, ...customPropsRest} = {}) => {
             return {
                 'aria-pressed': on,
-                onClick: () => {
-                    toggle();  // preserve default onClick
-                    onClick && onClick(); // "append" custom onClick if defined
-                },
+                onClick: callAll(onClick, toggle),
                 ...customPropsRest
             }
         }
@@ -29,7 +28,7 @@ function App() {
     const {on, getTogglerProps} = useToggle()
     return (
         <div>
-            <Switch on={on} {...getTogglerProps({on})} />
+            <Switch {...getTogglerProps({on})} />
             <hr/>
             <button {...getTogglerProps({
                 'aria-label': 'custom-button',
