@@ -3,6 +3,7 @@
 
 import * as React from 'react'
 import {Switch} from '../switch'
+import warning from "warning";
 
 const callAll = (...fns) => (...args) => fns.forEach(fn => fn?.(...args))
 
@@ -31,6 +32,9 @@ function useToggle({
   on: controlledOn,
   onChange
   } = {}) {
+
+  warning(!controlledOn || onChange, 'Passing on without onChange')
+
   const {current: initialState} = React.useRef({on: initialOn})
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
