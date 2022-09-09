@@ -13,6 +13,24 @@ const actionTypes = {
   reset: 'reset',
 }
 
+function useWarning(onIsControlled, onChange, readonly) {
+  const {current: onWasControlled} = useRef(onIsControlled) // use a ref to keep track of whether we were controlled in the past
+
+  useEffect(() => {
+    // see the following warning in DevTools console by initializing bothOn state in App component with an empty state (uncontrolled => controlled)
+    warning(!(onIsControlled && !onWasControlled), 'A component is changing an uncontrolled Toggle to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled Toggle for the lifetime of the component.')
+
+    // see the following warning in DevTools console by setting bothOn in App component handleToggleChange to an empty state (controlled => uncontrolled)
+    warning(!(!onIsControlled && onWasControlled), 'A component is changing a controlled Toggle to be uncontrolled. This is likely caused by the value changing from a defined value to undefined, which should not happen. Decide between using a controlled or uncontrolled Toggle for the lifetime of the component.')
+  }, [onIsControlled, onWasControlled])
+
+
+  useEffect(() => {
+    const hasOnChange = Boolean(onChange) // equivalent to !!onChange
+    warning(hasOnChange || !onIsControlled || readonly, 'You provided an `on` prop to a Toggle without an `onChange` handler. This will render a read-only Toggle. If the field should be mutable use `initialOn`. Otherwise, set either `onChange` or `readOnly`.')
+  }, [onChange, onIsControlled, readonly])
+}
+
 function toggleReducer(state, {type, initialState}) {
   switch (type) {
     case actionTypes.toggle: {
@@ -43,21 +61,7 @@ function useToggle({
   const onIsControlled = controlledOn != null // will be true if controlledOn is not null and is not undefined
   // (in JavaScript, undefined == null is true (but undefined === null is false)
 
-  const {current: onWasControlled} = useRef(onIsControlled) // use a ref to keep track of whether we were controlled in the past
-
-  useEffect(() => {
-    // see the following warning in DevTools console by initializing bothOn state in App component with an empty state (uncontrolled => controlled)
-    warning(!(onIsControlled && !onWasControlled), 'A component is changing an uncontrolled Toggle to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled Toggle for the lifetime of the component.')
-
-    // see the following warning in DevTools console by setting bothOn in App component handleToggleChange to an empty state (controlled => uncontrolled)
-    warning(!(!onIsControlled && onWasControlled), 'A component is changing a controlled Toggle to be uncontrolled. This is likely caused by the value changing from a defined value to undefined, which should not happen. Decide between using a controlled or uncontrolled Toggle for the lifetime of the component.')
-  }, [onIsControlled, onWasControlled])
-
-
-  useEffect(() => {
-    const hasOnChange = Boolean(onChange) // equivalent to !!onChange
-    warning(hasOnChange || !onIsControlled || readonly, 'You provided an `on` prop to a Toggle without an `onChange` handler. This will render a read-only Toggle. If the field should be mutable use `initialOn`. Otherwise, set either `onChange` or `readOnly`.')
-  }, [onChange, onIsControlled, readonly])
+  useWarning(onIsControlled, onChange, readonly)
 
   const on = onIsControlled ? controlledOn : state.on
 
