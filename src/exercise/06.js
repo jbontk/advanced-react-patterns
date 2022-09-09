@@ -4,7 +4,7 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 import warning from "warning";
-import {useEffect} from "react";
+import {useEffect, useRef} from "react";
 
 const callAll = (...fns) => (...args) => fns.forEach(fn => fn?.(...args))
 
@@ -43,6 +43,15 @@ function useToggle({
   const onIsControlled = controlledOn != null // will be true if controlledOn is not null and is not undefined
   // (in JavaScript, undefined == null is true (but undefined === null is false)
 
+  const {current: onWasControlled} = useRef(onIsControlled) // use a ref to keep track of whether we were controlled in the past
+
+  useEffect(() => {
+    // see the following warning in DevTools console by initializing bothOn state in App component with an empty state (uncontrolled => controlled)
+    warning(!(onIsControlled && !onWasControlled), 'A component is changing an uncontrolled Toggle to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled Toggle for the lifetime of the component.')
+
+    // see the following warning in DevTools console by setting bothOn in App component handleToggleChange to an empty state (controlled => uncontrolled)
+    warning(!(!onIsControlled && onWasControlled), 'A component is changing a controlled Toggle to be uncontrolled. This is likely caused by the value changing from a defined value to undefined, which should not happen. Decide between using a controlled or uncontrolled Toggle for the lifetime of the component.')
+  }, [onIsControlled, onWasControlled])
 
 
   useEffect(() => {
@@ -89,7 +98,7 @@ function useToggle({
 }
 
 function Toggle({on: controlledOn, onChange, readonly}) { // default value of readonly prop only set in useToggle custom hook
-  // no need to set that default value here, as undefined will be passed and it will not fail
+  // no need to set that default value here, as undefined will be passed, and it will not fail
   const {on, getTogglerProps} = useToggle({on: controlledOn, onChange, readonly})
   const props = getTogglerProps({on})
   return <Switch {...props} />
