@@ -81,17 +81,25 @@ function useToggle({
   // (in JavaScript, undefined == null is true (but undefined === null is false)
   const on = onIsControlled ? controlledOn : state.on
 
-  useControlledSwitchWithWarning(onIsControlled, 'on', 'useToggle')
-  useOnChangeReadOnlyWarning(
-      on,
-      'on',
-      'useToggle',
-      Boolean(onChange),
-      readOnly,
-      readOnly,
-      'initialOn',
-      onChange
-  )
+  if (process.env.NODE_ENV !== 'production') {
+
+    // ok to ignore the warning because NODE_ENV value does not change during the lifetime
+    // of the application where it's deployed
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useControlledSwitchWithWarning(onIsControlled, 'on', 'useToggle')
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useOnChangeReadOnlyWarning(
+        on,
+        'on',
+        'useToggle',
+        Boolean(onChange),
+        readOnly,
+        readOnly,
+        'initialOn',
+        onChange
+    )
+  }
 
 
   function dispatchWithOnChange(state, action) {
