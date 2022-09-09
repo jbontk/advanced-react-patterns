@@ -4,6 +4,7 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 import warning from "warning";
+import {useEffect} from "react";
 
 const callAll = (...fns) => (...args) => fns.forEach(fn => fn?.(...args))
 
@@ -30,11 +31,9 @@ function useToggle({
   initialOn = false,
   reducer = toggleReducer,
   on: controlledOn,
-  onChange
+  onChange,
+  readonly = false
   } = {}) {
-
-  warning(!controlledOn || onChange, 'Passing on without onChange')
-
   const {current: initialState} = React.useRef({on: initialOn})
   const [state, dispatch] = React.useReducer(reducer, initialState)
 
@@ -43,6 +42,13 @@ function useToggle({
 
   const onIsControlled = controlledOn != null // will be true if controlledOn is not null and is not undefined
   // (in JavaScript, undefined == null is true (but undefined === null is false)
+
+
+
+  useEffect(() => {
+    const hasOnChange = Boolean(onChange) // equivalent to !!onChange
+    warning(hasOnChange || !onIsControlled || readonly, 'You provided an `on` prop to a Toggle without an `onChange` handler. This will render a read-only Toggle. If the field should be mutable use `initialOn`. Otherwise, set either `onChange` or `readOnly`.')
+  }, [onChange, onIsControlled, readonly])
 
   const on = onIsControlled ? controlledOn : state.on
 
@@ -82,8 +88,9 @@ function useToggle({
   }
 }
 
-function Toggle({on: controlledOn, onChange}) {
-  const {on, getTogglerProps} = useToggle({on: controlledOn, onChange})
+function Toggle({on: controlledOn, onChange, readonly}) { // default value of readonly prop only set in useToggle custom hook
+  // no need to set that default value here, as undefined will be passed and it will not fail
+  const {on, getTogglerProps} = useToggle({on: controlledOn, onChange, readonly})
   const props = getTogglerProps({on})
   return <Switch {...props} />
 }
@@ -109,7 +116,7 @@ function App() {
     <div>
       <div>
         <Toggle on={bothOn} onChange={handleToggleChange} />
-        <Toggle on={bothOn} onChange={handleToggleChange} />
+        <Toggle on={bothOn} readonly={true} />
       </div>
       {timesClicked > 4 ? (
         <div data-testid="notice">
